@@ -28,6 +28,7 @@ class BytewiseComparatorImpl : public Comparator {
     return a.compare(b);
   }
 
+  // 此函数将start resize到只有最后一个字符不同
   void FindShortestSeparator(std::string* start,
                              const Slice& limit) const override {
     // Find length of common prefix

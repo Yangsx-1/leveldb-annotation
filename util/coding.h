@@ -6,6 +6,7 @@
 // * Fixed-length numbers are encoded with least-significant byte first
 // * In addition we support variable length "varint" encoding
 // * Strings are encoded prefixed by their length in varint format
+// leveldb是使用小端存储的
 
 #ifndef STORAGE_LEVELDB_UTIL_CODING_H_
 #define STORAGE_LEVELDB_UTIL_CODING_H_
@@ -55,7 +56,7 @@ inline void EncodeFixed32(char* dst, uint32_t value) {
   uint8_t* const buffer = reinterpret_cast<uint8_t*>(dst);
 
   // Recent clang and gcc optimize this to a single mov / str instruction.
-  buffer[0] = static_cast<uint8_t>(value);
+  buffer[0] = static_cast<uint8_t>(value); // 此处会直接截断
   buffer[1] = static_cast<uint8_t>(value >> 8);
   buffer[2] = static_cast<uint8_t>(value >> 16);
   buffer[3] = static_cast<uint8_t>(value >> 24);
@@ -105,6 +106,7 @@ inline uint64_t DecodeFixed64(const char* ptr) {
 // Internal routine for use by fallback path of GetVarint32Ptr
 const char* GetVarint32PtrFallback(const char* p, const char* limit,
                                    uint32_t* value);
+// 此函数只判断第一个字节是否为结束字节, 如果该字节后还有数据, 则调用Fallback函数
 inline const char* GetVarint32Ptr(const char* p, const char* limit,
                                   uint32_t* value) {
   if (p < limit) {

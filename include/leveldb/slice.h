@@ -11,6 +11,8 @@
 // external synchronization, but if any of the threads may call a
 // non-const method, all threads accessing the same Slice must use
 // external synchronization.
+// slice与string类似，一个数据指针加上一个长度变量
+// 但是使用slice需要保证slice的内部指针指向的内容是有效的，并且slice不是线程安全的
 
 #ifndef STORAGE_LEVELDB_INCLUDE_SLICE_H_
 #define STORAGE_LEVELDB_INCLUDE_SLICE_H_

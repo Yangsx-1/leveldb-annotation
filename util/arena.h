@@ -1,6 +1,7 @@
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
+// memtable中使用的内存池
 
 #ifndef STORAGE_LEVELDB_UTIL_ARENA_H_
 #define STORAGE_LEVELDB_UTIL_ARENA_H_
@@ -57,9 +58,9 @@ inline char* Arena::Allocate(size_t bytes) {
   // 0-byte allocations, so we disallow them here (we don't need
   // them for our internal use).
   assert(bytes > 0);
-  if (bytes <= alloc_bytes_remaining_) {
+  if (bytes <= alloc_bytes_remaining_) { // 简单地移动指针
     char* result = alloc_ptr_;
-    alloc_ptr_ += bytes;
+    alloc_ptr_ += bytes; // 指向下一个空位
     alloc_bytes_remaining_ -= bytes;
     return result;
   }

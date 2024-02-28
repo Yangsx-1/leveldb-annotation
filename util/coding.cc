@@ -1,6 +1,7 @@
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
+// varint的每个字节，最高位表示后续还有没有字节，后7为代表真实数字
 
 #include "util/coding.h"
 
@@ -22,7 +23,7 @@ char* EncodeVarint32(char* dst, uint32_t v) {
   // Operate on characters as unsigneds
   uint8_t* ptr = reinterpret_cast<uint8_t*>(dst);
   static const int B = 128;
-  if (v < (1 << 7)) {
+  if (v < (1 << 7)) {  // v < 128
     *(ptr++) = v;
   } else if (v < (1 << 14)) {
     *(ptr++) = v | B;
@@ -36,7 +37,7 @@ char* EncodeVarint32(char* dst, uint32_t v) {
     *(ptr++) = (v >> 7) | B;
     *(ptr++) = (v >> 14) | B;
     *(ptr++) = v >> 21;
-  } else {
+  } else {  // 32位int完全表示需要5个字节
     *(ptr++) = v | B;
     *(ptr++) = (v >> 7) | B;
     *(ptr++) = (v >> 14) | B;
@@ -63,17 +64,19 @@ char* EncodeVarint64(char* dst, uint64_t v) {
   return reinterpret_cast<char*>(ptr);
 }
 
-void PutVarint64(std::string* dst, uint64_t v) {
+void PutVarint64(std::string* dst, uint64_t v) {  // 64位int完全表示需要10个字节
   char buf[10];
   char* ptr = EncodeVarint64(buf, v);
   dst->append(buf, ptr - buf);
 }
 
+// 带数据长度的slice, varint表示长度 + 真正的slice数据
 void PutLengthPrefixedSlice(std::string* dst, const Slice& value) {
   PutVarint32(dst, value.size());
   dst->append(value.data(), value.size());
 }
 
+// 计算varint所需字节数
 int VarintLength(uint64_t v) {
   int len = 1;
   while (v >= 128) {
@@ -108,7 +111,7 @@ bool GetVarint32(Slice* input, uint32_t* value) {
   if (q == nullptr) {
     return false;
   } else {
-    *input = Slice(q, limit - q);
+    *input = Slice(q, limit - q);  // 更新slice所指数据
     return true;
   }
 }

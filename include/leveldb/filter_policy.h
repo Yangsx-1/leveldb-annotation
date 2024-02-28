@@ -12,6 +12,7 @@
 //
 // Most people will want to use the builtin bloom filter support (see
 // NewBloomFilterPolicy() below).
+// 所有filter policy的抽象基类
 
 #ifndef STORAGE_LEVELDB_INCLUDE_FILTER_POLICY_H_
 #define STORAGE_LEVELDB_INCLUDE_FILTER_POLICY_H_

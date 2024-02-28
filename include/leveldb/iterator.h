@@ -11,6 +11,7 @@
 // external synchronization, but if any of the threads may call a
 // non-const method, all threads accessing the same Iterator must use
 // external synchronization.
+// iterator抽象基类, 不是线程安全的
 
 #ifndef STORAGE_LEVELDB_INCLUDE_ITERATOR_H_
 #define STORAGE_LEVELDB_INCLUDE_ITERATOR_H_

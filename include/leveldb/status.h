@@ -34,7 +34,7 @@ class LEVELDB_EXPORT Status {
   Status& operator=(Status&& rhs) noexcept;
 
   // Return a success status.
-  static Status OK() { return Status(); }
+  static Status OK() { return Status(); }  // 构造一个新status
 
   // Return error status of an appropriate type.
   static Status NotFound(const Slice& msg, const Slice& msg2 = Slice()) {
@@ -100,19 +100,19 @@ class LEVELDB_EXPORT Status {
   const char* state_;
 };
 
-inline Status::Status(const Status& rhs) {
+inline Status::Status(const Status& rhs) {  // 这里是深拷贝
   state_ = (rhs.state_ == nullptr) ? nullptr : CopyState(rhs.state_);
 }
 inline Status& Status::operator=(const Status& rhs) {
   // The following condition catches both aliasing (when this == &rhs),
   // and the common case where both rhs and *this are ok.
-  if (state_ != rhs.state_) {
+  if (state_ != rhs.state_) {  // 这里避免了自己拷贝自己时可能的问题, 比如Status a; a = a;
     delete[] state_;
     state_ = (rhs.state_ == nullptr) ? nullptr : CopyState(rhs.state_);
   }
   return *this;
 }
-inline Status& Status::operator=(Status&& rhs) noexcept {
+inline Status& Status::operator=(Status&& rhs) noexcept {  // 移动拷贝, 交换state的地址
   std::swap(state_, rhs.state_);
   return *this;
 }

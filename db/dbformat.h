@@ -79,7 +79,7 @@ struct ParsedInternalKey {
 
 // Return the length of the encoding of "key".
 inline size_t InternalKeyEncodingLength(const ParsedInternalKey& key) {
-  return key.user_key.size() + 8;
+  return key.user_key.size() + 8;  // userkey长度加上8byte数据, 分别是序列号和value类型
 }
 
 // Append the serialization of "key" to *result.
@@ -131,6 +131,7 @@ class InternalFilterPolicy : public FilterPolicy {
 // Modules in this directory should keep internal keys wrapped inside
 // the following class instead of plain strings so that we do not
 // incorrectly use string comparisons instead of an InternalKeyComparator.
+// 所有的内部key实现, 此文件中最重要的内容, internalkey包括了userkey, 序列号和value类型, 三者组成一个std::string
 class InternalKey {
  private:
   std::string rep_;
@@ -141,6 +142,7 @@ class InternalKey {
     AppendInternalKey(&rep_, ParsedInternalKey(user_key, s, t));
   }
 
+  // 将s赋值给rep
   bool DecodeFrom(const Slice& s) {
     rep_.assign(s.data(), s.size());
     return !rep_.empty();
@@ -181,6 +183,7 @@ inline bool ParseInternalKey(const Slice& internal_key,
 }
 
 // A helper class useful for DBImpl::Get()
+// lookupkey其实就是memtable中存储的kv序列除去value, key len + internalkey
 class LookupKey {
  public:
   // Initialize *this for looking up user_key at a snapshot with

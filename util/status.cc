@@ -22,12 +22,12 @@ Status::Status(Code code, const Slice& msg, const Slice& msg2) {
   assert(code != kOk);
   const uint32_t len1 = static_cast<uint32_t>(msg.size());
   const uint32_t len2 = static_cast<uint32_t>(msg2.size());
-  const uint32_t size = len1 + (len2 ? (2 + len2) : 0);
+  const uint32_t size = len1 + (len2 ? (2 + len2) : 0);  // size只包含了信息长度, 不包含code
   char* result = new char[size + 5];
   std::memcpy(result, &size, sizeof(size));
   result[4] = static_cast<char>(code);
   std::memcpy(result + 5, msg.data(), len1);
-  if (len2) {
+  if (len2) { // 比如 a: bbb
     result[5 + len1] = ':';
     result[6 + len1] = ' ';
     std::memcpy(result + 7 + len1, msg2.data(), len2);

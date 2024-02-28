@@ -1,6 +1,8 @@
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
+// skiplist类的实现, 线程不安全, 需要加锁
+// 内部包含iterator和node, node包含一个next数组, 代表多层指针
 
 #ifndef STORAGE_LEVELDB_DB_SKIPLIST_H_
 #define STORAGE_LEVELDB_DB_SKIPLIST_H_
@@ -180,7 +182,7 @@ template <typename Key, class Comparator>
 typename SkipList<Key, Comparator>::Node* SkipList<Key, Comparator>::NewNode(
     const Key& key, int height) {
   char* const node_memory = arena_->AllocateAligned(
-      sizeof(Node) + sizeof(std::atomic<Node*>) * (height - 1));
+      sizeof(Node) + sizeof(std::atomic<Node*>) * (height - 1)); // node中包含一个next指针, 所以需要height-1个
   return new (node_memory) Node(key);
 }
 
